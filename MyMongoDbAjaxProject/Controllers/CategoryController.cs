@@ -16,9 +16,43 @@ namespace MyMongoDbAjaxProject.Controllers
             _categoryCollection = database.GetCollection<Category>(_databaseSettings.CategoryCollectionName);
                 
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
+        {
+            var values=await _categoryCollection.Find(x=>true).ToListAsync();
+            return View(values);
+        }
+
+        [HttpGet]
+        public IActionResult CreateCategory()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(Category category)
+        {
+            await _categoryCollection.InsertOneAsync(category);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> DeleteCategory(string id)
+        {
+            await _categoryCollection.DeleteOneAsync(x=>x.CategoryID==id);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateCategory(string id)
+        {
+            var values=await _categoryCollection.Find(x=>x.CategoryID == id).FirstOrDefaultAsync();
+            return View(values);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCategory(Category category)
+        {
+            await _categoryCollection.FindOneAndReplaceAsync(x => x.CategoryID == category.CategoryID, category);
+            return RedirectToAction("Index");
         }
     }
 }
