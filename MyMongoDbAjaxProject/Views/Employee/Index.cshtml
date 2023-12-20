@@ -39,7 +39,31 @@
     <input type="text" class="form-control" placeholder="Personel Maaş" id="txtsalary" style="border:1px solid #000" />
 </div>
 
+<hr />
 
+<h3>Personel Getirme Paneli</h3>
+<input type="text" class="form-control" placeholder="Getirmek istediğiniz Personel Id" id="txtemployeeid" style="border:1px solid #000" />
+
+<div id="employeelistbyid"></div>
+
+<hr />
+
+<div>
+    <h3>Personel Silme Alanı</h3>
+    <input type="text" class="form-control" placeholder="Silmek istediğiniz Personel Id" id="txtdeleteemployeeid" style="border:1px solid #000" />
+</div>
+<hr />
+
+<div>
+    <h3>Personel Güncelleme Alanı</h3>
+    <input type="text" class="form-control" placeholder="Güncellenecek Personel Id" id="txtidedit" style="border:1px solid #000" />
+    <br />
+    <input type="text" class="form-control" placeholder="Güncellenecek Personel Adı" id="txtnameedit" style="border:1px solid #000" />
+    <br />
+    <input type="text" class="form-control" placeholder="Güncellenecek Personel Soyadı" id="txtsurnameedit" style="border:1px solid #000" />
+    <br />
+    <input type="text" class="form-control" placeholder="Güncellenecek Personel Maaş" id="txtsalaryedit" style="border:1px solid #000" />
+</div>
 
 <script>
 
@@ -77,7 +101,7 @@
     $("#btnemployeecreate").click(function () {
         let employeevalues = {
             EmployeeName: $("#txtname").val(),
-            EmployeeSurname: $("txtsurname").val(),
+            EmployeeSurname: $("#txtsurname").val(),
             EmployeeSalary: $("#txtsalary").val()
         };
 
@@ -88,8 +112,71 @@
             success: function (funk2) {
                 let result = jQuery.parseJSON(funk2);
                 alert("Personel Başarılı Şekilde Eklendi");
+
+               // $("#btnemployeelist").click();
+            }
+        });
+    });
+
+    $("#btnemployeeget").click(function () {
+        let id = $("#txtemployeeid").val();
+
+        $.ajax({
+            contentType: "application/json",
+            dataType: "json",
+            url: "/Employee/GetEmployee/",
+            data: { EmployeeId: id },
+            success: function (funk3) {
+                let result = jQuery.parseJSON(funk3);
+                console.log(result);
+                let htmlstr = `<table class=table table-hover>
+                                        <tr>
+                                        <th>Personel ID</th>
+                                        <th>Personel Adı</th>
+                                        <th>Personel Soyadı</th>
+                                        <th>Personel Maaş</th>
+                                        </tr>
+                                        <tr>
+                                            <td>${result.EmployeeID}</td>
+                                            <td>${result.EmployeeName}</td>
+                                            <td>${result.EmployeeSurname}</td>
+                                            <td>${result.EmployeeSalary}</td>
+                                        </tr>
+                                            </table>`;
+                $("#employeelistbyid").html(htmlstr);
+            }
+        });
+    });
+
+    $("#btnemployeedelete").click(function () {
+        let id = $("#txtdeleteemployeeid").val();
+        $.ajax({
+            url: "/Employee/DeleteEmployee/" + id,
+            type: "Get",
+            contentType: "application/json",
+            success: function (funk4) {
+                swal("Personel Başarılı Şekilde Silindi");
+            }
+        });
+    });
+
+    $("#btnemployeeupdate").click(function () {
+        let values = {
+            EmployeeID:$("#txtidedit").val(),
+            EmployeeName:$("#txtnameedit").val(),
+            EmployeeSurname:$("#txtsurnameedit").val(),
+            EmployeeSalary:$("#txtsalaryedit").val()
+        };
+        $.ajax({
+            url: "/Employee/UpdateEmployee/",
+            type:"post",
+            data: values,
+            success: function (funk5) {
+                swal("Güncelleme Başarılı")
             }
         });
     });
 
 </script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
